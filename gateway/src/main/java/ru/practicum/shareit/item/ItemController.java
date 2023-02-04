@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import ru.practicum.shareit.item.dto.CommentCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/items")
@@ -29,7 +31,7 @@ public class ItemController {
     public ResponseEntity<Object> update(@RequestHeader("X-Sharer-User-Id") long userId,
                                          @PathVariable(name = "itemId") long itemId,
                                          @RequestBody ItemDto itemDto) {
-        log.info("Updating item with id = {} by user with id = {} to {}.", itemId, userId, itemDto);
+       log.info("Updating item with id = {} by user with id = {} to {}.", itemId, userId, itemDto);
        return itemClient.update(userId, itemId, itemDto);
     }
 
@@ -52,6 +54,9 @@ public class ItemController {
                                      @RequestParam(required = false, defaultValue = "0") Integer from,
                                      @RequestParam(required = false) Integer size) {
         log.info("Searching items by substring = '{}'.", text);
+        if (text.isBlank()) {
+            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+        }
         return itemClient.searchItems(text, from, size);
     }
 
